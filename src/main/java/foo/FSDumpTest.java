@@ -6,12 +6,27 @@ import java.io.IOException;
 
 public class FSDumpTest {
     public static void main(String[] args) {
-        FileOutputStream fop = null;
-        File file;
-        String content = "This is the text content";
-        byte[] contentInBytes = content.getBytes();
-        file = new File(args[0]);
+        final String argsf = args[0];
+        final File file;
+        final String content = "This is the text content";
+        final byte[] contentInBytes = content.getBytes();
 
+
+        for (int i = 0; i < 100; i++) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    runFileWritter(argsf, contentInBytes);
+                }
+            }).start();
+        }
+
+
+    }
+
+    private static void runFileWritter(String arg, byte[] contentInBytes) {
+        FileOutputStream fop = null;
+        File file = new File(arg + Thread.currentThread().getId());
         try {
             while (true){
             // if file doesnt exists, then create it
@@ -24,6 +39,7 @@ public class FSDumpTest {
                     fop.write(contentInBytes);
                     fop.flush();
                 }
+                fop.close();
                 file.delete();
             }
         } catch (IOException e) {
